@@ -6,6 +6,7 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+*.iml                # Android Studio / IntelliJ プロジェクトファイル
 
 # ──────────────────────────────
 # Node／Web (必要なら)
@@ -35,6 +36,8 @@ coverage/
 **/android/**/gradle-wrapper.jar
 local.properties
 **/.cxx/
+android/**/generated_plugin_registrant*   # 生成されるプラグイン ファイル
+android/**/google-services.json           # Firebase 設定（ローカルのみ）
 
 # ──────────────────────────────
 # iOS / macOS
@@ -43,15 +46,21 @@ local.properties
 **/ios/Flutter/ephemeral/
 **/macos/Flutter/ephemeral/
 **/xcuserdata/
+ios/Podfile.lock
+ios/**/GeneratedPluginRegistrant.*        # 生成されるプラグイン ファイル
+macos/Flutter/GeneratedPluginRegistrant.swift
 
 # ──────────────────────────────
 # Windows / Linux
 # ──────────────────────────────
 **/windows/flutter/ephemeral/
 **/linux/flutter/ephemeral/
+windows/**/generated_plugin_registrant.*
+windows/**/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.*
+linux/flutter/generated_plugins.cmake
 
 # ──────────────────────────────
 # 調査・ツール生成物
 # ──────────────────────────────
-coverage/
 app.*.symbols
