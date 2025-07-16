@@ -6,15 +6,15 @@
 # ------------------------------------------------------------------
 
 # 公式 Docker Hub が提供している Flutter コンテナ
-image: cirrusci/flutter:3.32.1
+image: instrumentisto/flutter:3.32.6
 
 pipelines:
   default:
     - step:
         name: Analyze & Test
         caches:                # ↓ ビルド時間短縮用キャッシュ
-          - flutter
-          - gradle
+          - flutter            # ~/.pub-cache
+          - gradle             # ~/.gradle
         script:
           # ① 依存取得
           - flutter pub get
@@ -23,7 +23,7 @@ pipelines:
           # ③ テスト実行（今はテストなし → 0 件成功となる）
           - flutter test --coverage
         artifacts:             # 生成物を保存したい場合（あとで HTML 解析レポートなど）
-          - coverage/**
+          - coverage/**        # HTML レポート等を将来保存したい場合
 definitions:
   caches:
     flutter: ~/.pub-cache      # Pub キャッシュ
