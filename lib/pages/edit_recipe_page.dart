@@ -28,23 +28,27 @@ class _EditRecipePageState extends State<EditRecipePage> {
             key: _formKey,
             child: ListView(
               children: [
+                // ────────────────────────────────────── タイトル
                 TextFormField(
                   controller: _title,
                   decoration: const InputDecoration(labelText: 'タイトル'),
                   validator: (v) =>
                       (v == null || v.isEmpty) ? '必須です' : null,
                 ),
+                // ────────────────────────────────────── 材料
                 TextFormField(
                   controller: _ingredients,
                   decoration:
                       const InputDecoration(labelText: '材料（カンマ区切り）'),
                 ),
+                // ────────────────────────────────────── 手順
                 TextFormField(
                   controller: _steps,
                   decoration: const InputDecoration(labelText: '手順'),
                   maxLines: 6,
                 ),
                 const SizedBox(height: 16),
+                // ────────────────────────────────────── 保存ボタン
                 ElevatedButton.icon(
                   icon: const Icon(Icons.save),
                   label: const Text('保存'),
@@ -64,26 +68,25 @@ class _EditRecipePageState extends State<EditRecipePage> {
 
                     try {
                       await context.read<RecipeService>().addRecipe(recipe);
-                      if (context.mounted) Navigator.pop(context);
+                      if (!mounted) return; // BuildContext 安全
+                      Navigator.pop(context);
                     } catch (e) {
-                      if (!context.mounted) return;
+                      if (!mounted) return;
 
-                      // ── 保存枠オーバー時 ─────────────────────────────
+                      // ── 保存枠オーバー時 ────────────────────────
                       if (e.toString().contains('Quota exceeded')) {
                         final ok = await showDialog<bool>(
                           context: context,
                           barrierDismissible: false,
                           builder: (dialogCtx) {
                             final ad = dialogCtx.watch<AdService>();
-
                             return AlertDialog(
                               title: const Text('保存枠がいっぱいです'),
                               content: const Text(
-                                  '保存上限 30 件を超えました。\n広告を視聴すると保存枠を +5 件拡張できます。'),
+                                '保存上限 30 件を超えました。\n広告を視聴すると保存枠を +5 件拡張できます。'),
                               actions: [
                                 TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(dialogCtx, false),
+                                  onPressed: () => Navigator.pop(dialogCtx, false),
                                   child: const Text('キャンセル'),
                                 ),
                                 ElevatedButton(
@@ -94,8 +97,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
                                       ? const SizedBox(
                                           width: 16,
                                           height: 16,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2),
+                                          child: CircularProgressIndicator(strokeWidth: 2),
                                         )
                                       : const Text('広告を見る'),
                                 ),
@@ -104,13 +106,11 @@ class _EditRecipePageState extends State<EditRecipePage> {
                           },
                         );
 
-                        if (ok == true) {
-                          await context
-                              .read<AdService>()
-                              .showRewardedAd(context);
+                        if (ok == true && mounted) {
+                          await context.read<AdService>().showRewardedAd(context);
                         }
                       } else {
-                        // ── その他のエラー ─────────────────────────────
+                        // ── その他のエラー ──────────────────────────
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),
                         );

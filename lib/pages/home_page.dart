@@ -1,4 +1,3 @@
-// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -13,8 +12,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recipeService = context.watch<RecipeService>(); // 枠数を参照
-    final adService     = context.watch<AdService>();     // 広告状態を参照
+    final recipeService = context.watch<RecipeService>();
+    final adService     = context.watch<AdService>();
 
     return StreamBuilder<List<Recipe>>(
       stream: recipeService.streamRecipes(),
@@ -37,8 +36,7 @@ class HomePage extends StatelessWidget {
                 const Text('My Recipes'),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 4, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   decoration: BoxDecoration(
                     color: Colors.green.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -65,37 +63,32 @@ class HomePage extends StatelessWidget {
                       background: Container(
                         alignment: Alignment.centerRight,
                         color: Colors.red,
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 24),
-                        child:
-                            const Icon(Icons.delete, color: Colors.white),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
                       direction: DismissDirection.endToStart,
-                      confirmDismiss: (_) async => await showDialog<bool>(
+                      confirmDismiss: (dir) async => await showDialog<bool>(
                         context: context,
-                        builder: (_) => AlertDialog(
+                        builder: (dialogCtx) => AlertDialog(
                           title: const Text('削除しますか？'),
-                          content: Text(
-                              '「${r.title}」を削除します。よろしいですか？'),
+                          content: Text('「${r.title}」を削除します。よろしいですか？'),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.pop(_, false),
+                              onPressed: () => Navigator.pop(dialogCtx, false),
                               child: const Text('キャンセル'),
                             ),
                             ElevatedButton(
-                              onPressed: () => Navigator.pop(_, true),
+                              onPressed: () => Navigator.pop(dialogCtx, true),
                               child: const Text('削除'),
                             ),
                           ],
                         ),
                       ),
-                      onDismissed: (_) =>
-                          context.read<RecipeService>().deleteRecipe(r.id),
+                      onDismissed: (_) => context.read<RecipeService>().deleteRecipe(r.id),
                       child: ListTile(
                         title: Text(r.title),
                         subtitle: Text(r.ingredients.join(', ')),
-                        trailing:
-                            Text(DateFormat.yMd().format(r.createdAt)),
+                        trailing: Text(DateFormat.yMd().format(r.createdAt)),
                       ),
                     );
                   },
@@ -105,27 +98,17 @@ class HomePage extends StatelessWidget {
           floatingActionButton: isFull
               // 保存枠が一杯：広告視聴へ誘導
               ? FloatingActionButton.extended(
-                  onPressed: adService.isReady
-                      ? () => adService.showRewardedAd(context)
-                      : null,
+                  onPressed: adService.isReady ? () => adService.showRewardedAd(context) : null,
                   icon: adService.isLoading
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child:
-                              CircularProgressIndicator(strokeWidth: 2),
-                        )
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                       : const Icon(Icons.play_circle),
-                  label: Text(adService.isReady
-                      ? '+5 枠 (広告)'
-                      : '読み込み中…'),
+                  label: Text(adService.isReady ? '+5 枠 (広告)' : '読み込み中…'),
                 )
               // まだ保存枠に余裕あり：新規追加へ
               : FloatingActionButton.extended(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const EditRecipePage(uid: '')),
+                    MaterialPageRoute(builder: (_) => const EditRecipePage(uid: '')),
                   ),
                   icon: const Icon(Icons.add),
                   label: const Text('新規追加'),
