@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------
 
 # 公式 Docker Hub が提供している Flutter コンテナ
-image: cirrusci/flutter:3.32.5
+image: cirrusci/flutter:3.32.1
 
 pipelines:
   default:
