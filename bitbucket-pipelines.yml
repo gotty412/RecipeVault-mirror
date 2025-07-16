@@ -1,0 +1,30 @@
+# bitbucket-pipelines.yml
+# ------------------------------------------------------------------
+# Flutter プロジェクトを “解析 → テスト” するだけの最小構成 CI
+#   - 解析に通らない / テストが落ちる場合は赤で失敗
+#   - 成功すれば緑で通過
+# ------------------------------------------------------------------
+
+# 公式 Docker Hub が提供している Flutter コンテナ
+image: cirrusci/flutter:3.32.5
+
+pipelines:
+  default:
+    - step:
+        name: Analyze & Test
+        caches:                # ↓ ビルド時間短縮用キャッシュ
+          - flutter
+          - gradle
+        script: |
+          # ① 依存取得
+          flutter pub get
+          # ② 静的解析 (warning 以上があればエラーで終了)
+          flutter analyze --no-pub
+          # ③ テスト実行（今はテストなし → 0 件成功となる）
+          flutter test --coverage
+        artifacts:             # 生成物を保存したい場合（あとで HTML 解析レポートなど）
+          - coverage/**
+definitions:
+  caches:
+    flutter: ~/.pub-cache      # Pub キャッシュ
+    gradle:  ~/.gradle         # Android Gradle キャッシュ
