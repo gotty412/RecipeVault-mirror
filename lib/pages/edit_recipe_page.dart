@@ -115,13 +115,12 @@ class _EditRecipePageState extends State<EditRecipePage> {
                             );
                           },
                         );
-
-                        if (ok == true && mounted) {
-                          // ★ ここも await 前に Service を取得
-                          final adService = context.read<AdService>();
-                          await adService.showRewardedAd(context);
+                        if (ok == true) {
+                          // ★ mounted を再チェックしてから UI 操作
+                            if (!mounted) return;
+                            await context.read<AdService>().showRewardedAd(context);
                         }
-                      } else {
+                        } else {
                         // ── その他のエラー ────────────
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),
