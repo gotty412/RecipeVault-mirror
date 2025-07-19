@@ -89,7 +89,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
                             return AlertDialog(
                               title: const Text('保存枠がいっぱいです'),
                               content: const Text(
-                                '保存上限 10 件を超えました。\n'
+                                '保存上限 30 件を超えました。\n'
                                 '広告を視聴すると保存枠を +5 件拡張できます。'),
                               actions: [
                                 TextButton(
