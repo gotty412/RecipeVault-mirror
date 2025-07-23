@@ -22,8 +22,12 @@ pipelines:
           - flutter analyze --no-pub
           # ③ テスト実行（今はテストなし → 0 件成功となる）
           - flutter test --coverage
+          # ④ GitHub へ同期（現在のブランチとタグをコピー）
+          - git push github HEAD:$(git rev-parse --abbrev-ref HEAD)
+          - git push github --tags
         artifacts:             # 生成物を保存したい場合（あとで HTML 解析レポートなど）
           - coverage/**        # HTML レポート等を将来保存したい場合
+
 definitions:
   caches:
     flutter: ~/.pub-cache      # Pub キャッシュ
