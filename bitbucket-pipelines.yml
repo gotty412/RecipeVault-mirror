@@ -18,7 +18,7 @@ pipelines:
         script:
           # ① 依存取得
           - flutter pub get
-          # ② 静的解析 (warning 以上があればエラーで終了)
+          # ② 静的解析 (warning 以上があればエラーで終了) 
           - flutter analyze --no-pub
           # ③ テスト実行（今はテストなし → 0 件成功となる）
           - flutter test --coverage
