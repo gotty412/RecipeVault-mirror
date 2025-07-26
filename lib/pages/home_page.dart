@@ -108,7 +108,9 @@ class HomePage extends StatelessWidget {
               : FloatingActionButton.extended(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const EditRecipePage(uid: '')),
+                    MaterialPageRoute(
+                      builder: (_) => const EditRecipePage(),   // ← uid 引数を取らない
+                    ),
                   ),
                   icon: const Icon(Icons.add),
                   label: const Text('新規追加'),
