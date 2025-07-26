@@ -13,7 +13,7 @@ pipelines:
     - step:
         name: Analyze & Test
         caches:                # ↓ ビルド時間短縮用キャッシュ
-          - flutter            # ~/.pub-cache 
+          - flutter            # ~/.pub-cache
           - gradle             # ~/.gradle
         script:
           # ① 依存取得
