@@ -1,0 +1,27 @@
+# .github/workflows/flutter_ci.yml
+name: Analyze & Test (Flutter)
+
+on: [push, pull_request]
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ソース取得
+      - uses: actions/checkout@v4
+
+      # Flutter セットアップ（キャッシュ込み）  :contentReference[oaicite:0]{index=0}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'   # プロジェクトのバージョンに合わせる
+          cache: true
+
+      # 依存取得
+      - run: flutter pub get
+
+      # 静的解析
+      - run: flutter analyze --no-pub
+
+      # テスト
+      - run: flutter test --coverage
