@@ -1,13 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:recipe_vault/services/recipe_service.dart';
 
 void main() {
+  // --- Firebase をモック初期化 -----------------------------
+  setupFirebaseCoreMocks();
+  setUpAll(() async {
+    await Firebase.initializeApp();
+  });
+
   test('expandQuota() で枠が +5 増える', () {
-    final service  = RecipeService();   // 依存先にはまだ触れない
-    final initial  = service.quota;
+    final service = RecipeService();
+    final initial = service.quota;
 
-    service.expandQuota();              // 1 度呼ぶ
+    service.expandQuota();
 
-    expect(service.quota, initial + 5); // ★ 合計が +5 になっているか
+    expect(service.quota, initial + 5);
   });
 }
