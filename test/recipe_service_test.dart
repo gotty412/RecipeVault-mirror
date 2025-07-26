@@ -5,8 +5,14 @@ import 'package:firebase_core_platform_interface/test.dart';
 import 'package:recipe_vault/services/recipe_service.dart';
 
 void main() {
-  setupFirebaseCoreMocks();     // Firebase をテスト用モックに
+  // ① テスト用 Flutter バインディングを初期化
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  // ② Firebase モックを設定
+  setupFirebaseCoreMocks();
+
   setUpAll(() async {
+    // ③ ダミーの Firebase App を初期化
     await Firebase.initializeApp();
   });
 
