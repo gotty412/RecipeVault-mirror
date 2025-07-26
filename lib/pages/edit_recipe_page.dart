@@ -5,9 +5,12 @@ import '../models/recipe.dart';
 import '../services/recipe_service.dart';
 import '../services/ad_service.dart';
 
-/// レシピ新規追加ページ
 class EditRecipePage extends StatefulWidget {
-  const EditRecipePage({super.key, required this.uid});
+  const EditRecipePage({
+    super.key,
+    required this.uid,
+  });
+
   final String uid;
 
   @override
@@ -15,136 +18,133 @@ class EditRecipePage extends StatefulWidget {
 }
 
 class _EditRecipePageState extends State<EditRecipePage> {
-  final _title       = TextEditingController();
-  final _ingredients = TextEditingController();
-  final _steps       = TextEditingController();
-  final _formKey     = GlobalKey<FormState>();
+  final _titleCtrl       = TextEditingController();
+  final _ingredientsCtrl = TextEditingController();
+  final _stepsCtrl       = TextEditingController();
+  final _formKey         = GlobalKey<FormState>();
+
+  bool _isLoading   = true;
+  int  _quota       = 0;
+  int  _currentCnt  = 0;
 
   @override
-  void dispose() {
-    _title.dispose();
-    _ingredients.dispose();
-    _steps.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    // ── データ取得 ─────────────────────────────
+    final recipeService = context.read<RecipeService>();
+    final recipe        = await recipeService.fetchRecipe(widget.uid);
+
+    if (!mounted) return;           // ← State が破棄されたら中断
+
+    _titleCtrl.text       = recipe.title;
+    _ingredientsCtrl.text = recipe.ingredients;
+    _stepsCtrl.text       = recipe.steps;
+    _quota                = recipeService.quota;
+    _currentCnt           = recipeService.count;
+
+    setState(() => _isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('レシピを追加')),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                // ─────────── タイトル
-                TextFormField(
-                  controller: _title,
-                  decoration: const InputDecoration(labelText: 'タイトル'),
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? '必須です' : null,
-                ),
-                // ─────────── 材料
-                TextFormField(
-                  controller: _ingredients,
-                  decoration:
-                      const InputDecoration(labelText: '材料（カンマ区切り）'),
-                ),
-                // ─────────── 手順
-                TextFormField(
-                  controller: _steps,
-                  decoration: const InputDecoration(labelText: '手順'),
-                  maxLines: 6,
-                ),
-                const SizedBox(height: 16),
+  void dispose() {
+    _titleCtrl.dispose();
+    _ingredientsCtrl.dispose();
+    _stepsCtrl.dispose();
+    super.dispose();
+  }
 
-                // ─────────── 保存ボタン
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.save),
-                  label: const Text('保存'),
-                  onPressed: () async {
-                    // フォーム検証
-                    if (!_formKey.currentState!.validate()) return;
+  // ── 保存処理 ──────────────────────────────────
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
 
-                    // 入力値をモデルへ
-                    final recipe = Recipe(
-                      id: '',
-                      title: _title.text.trim(),
-                      ingredients: _ingredients.text
-                          .split(',')
-                          .map((e) => e.trim())
-                          .toList(),
-                      steps: _steps.text.trim(),
-                      createdAt: DateTime.now(),
-                    );
+    // BuildContext を避けて事前に取得
+    final navigator         = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final recipeService     = context.read<RecipeService>();
 
-                    // Provider は await 前に取得
-                    final recipeService = context.read<RecipeService>();
+    await recipeService.updateRecipe(
+      uid:         widget.uid,
+      title:       _titleCtrl.text.trim(),
+      ingredients: _ingredientsCtrl.text.trim(),
+      steps:       _stepsCtrl.text.trim(),
+    );
 
-                    try {
-                      await recipeService.addRecipe(recipe);
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(content: Text('保存しました')),
+    );
 
-                      if (!mounted) return; // await 後に必ず mounted チェック
-                      Navigator.of(context).pop();
-                    } catch (e) {
-                      if (!mounted) return;
+    navigator.pop();               // 画面を閉じる
+  }
 
-                      // ─── 保存枠オーバー時 ─────────────────────
-                      if (e.toString().contains('Quota exceeded')) {
-                        final bool? watchAd = await showDialog<bool>(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (dialogCtx) {
-                            final ad = dialogCtx.watch<AdService>();
-                            return AlertDialog(
-                              title: const Text('保存枠がいっぱいです'),
-                              content: const Text(
-                                '保存上限 30 件を超えました。\n'
-                                '広告を視聴すると保存枠を +5 件拡張できます。',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(dialogCtx).pop(false),
-                                  child: const Text('キャンセル'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: ad.isReady
-                                      ? () =>
-                                          Navigator.of(dialogCtx).pop(true)
-                                      : null,
-                                  child: ad.isLoading
-                                      ? const SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Text('広告を見る'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+  // ── 広告視聴で枠拡張 ────────────────────────────
+  Future<void> _expandQuota() async {
+    final adWatched = await context.read<AdService>().showRewardedAd();
+    if (!adWatched) return;
 
-                        // 広告視聴
-                        if (watchAd == true && mounted) {
-                          final adService = context.read<AdService>();
-                          await adService.showRewardedAd(context);
-                        }
-                      } else {
-                        // ─── その他のエラー ─────────────────────
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(e.toString())),
-                        );
-                      }
-                    }
-                  },
-                ),
-              ],
+    await context.read<RecipeService>().expandQuota(5);
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop();   // 1 つ前の画面に戻って再描画
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final reachedLimit = _currentCnt >= _quota;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('レシピを編集'),
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Text('$_currentCnt / $_quota'),
             ),
           ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: reachedLimit ? _expandQuota : _save,
+        label: Text(reachedLimit ? '+5枠 (広告)' : '保存'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _titleCtrl,
+                decoration: const InputDecoration(labelText: 'タイトル'),
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? '入力してください' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _ingredientsCtrl,
+                decoration: const InputDecoration(labelText: '材料'),
+                maxLines: 5,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _stepsCtrl,
+                decoration: const InputDecoration(labelText: '手順'),
+                maxLines: 8,
+              ),
+            ],
+          ),
         ),
-      );
+      ),
+    );
+  }
 }
