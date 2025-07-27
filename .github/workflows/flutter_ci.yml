@@ -25,3 +25,7 @@ jobs:
 
       # テスト
       - run: flutter test --coverage
+
+      # 
+      - name: Codecov
+        uses: codecov/codecov-action@v5

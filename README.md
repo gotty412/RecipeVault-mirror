@@ -1,7 +1,9 @@
 # 🍳 RecipeVault
 
 ![CI](https://github.com/gotty412/RecipeVault/actions/workflows/flutter_ci.yml/badge.svg)
-![coverage](https://img.shields.io/codecov/c/github/gotty412/RecipeVault?logo=codecov)
+![coverage](https://codecov.io/gh/gotty412/RecipeVault/branch/main/graph/badge.svg)
+
+&#x20;
 
 Flutter 製 **個人レシピ帳**
 広告（リワード）視聴で保存上限を拡張できる MVP 版アプリです。
@@ -32,9 +34,9 @@ Flutter 製 **個人レシピ帳**
 
 ## スクリーンショット
 
-|          ホーム（残枠あり）         |           枠上限→広告提案           |          広告視聴後 Toast         |
-| :------------------------: | :--------------------------: | :--------------------------: |
-| ![home](docs/img/home.png) | ![quota](docs/img/quota.png) | ![toast](docs/img/toast.png) |
+| ホーム（残枠あり） | 枠上限→広告提案 | 広告視聴後 Toast |
+| --------- | -------- | ----------- |
+|           |          |             |
 
 ---
 
@@ -115,11 +117,7 @@ dart pub global activate flutterfire_cli   # FlutterFire CLI
 
 ## 📍 今後のロードマップ
 
-* [ ] 写真アップロード
-* [ ] タグ検索
-* [ ] ダークテーマ対応
-* [ ] E2E テスト（`integration_test` + Firebase Emulator）
-* [ ] ストアリリース 🛫
+*
 
 ---
 
