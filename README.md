@@ -1,7 +1,7 @@
 # 🍳 RecipeVault
 
 ![CI](https://github.com/gotty412/RecipeVault/actions/workflows/flutter_ci.yml/badge.svg)
-![coverage](https://codecov.io/gh/gotty412/RecipeVault/branch/main/graph/badge.svg)
+![coverage](https://codecov.io/gh/gotty412/recipevault/branch/main/graph/badge.svg)
 
 &#x20;
 
