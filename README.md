@@ -5,6 +5,10 @@
 
 &#x20;
 
+&#x20;
+
+&#x20;
+
 Flutter 製 **個人レシピ帳**
 広告（リワード）視聴で保存上限を拡張できる MVP 版アプリです。
 *“Save your favourite recipes & grow your quota by watching a short ad.”*
