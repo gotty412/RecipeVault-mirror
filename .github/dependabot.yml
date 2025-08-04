@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # ① Dart / Flutter パッケージ（pubspec.yaml）
+  - package-ecosystem: "pub"
+    directory: "/"        # ルート
+    schedule:
+      interval: "weekly"  # 週1（月曜デフォルト）
+    open-pull-requests-limit: 5
+  # ② GitHub Actions 自体のバージョン
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
