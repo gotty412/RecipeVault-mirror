@@ -1,0 +1,21 @@
+# .github/workflows/auto-label.yml
+#
+# Dependabot が開いた PR に自動で `dependabot` ラベルを付ける簡単な Workflow
+# ------------------------------------------------------------
+
+name: Auto-label Dependabot PR
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  label-dependabot:
+    if: github.actor == 'dependabot[bot]'   # Dependabot が作った PR だけ対象
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add "dependabot" label
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: dependabot

@@ -1,0 +1,14 @@
+# .github/labels.yml
+#
+# リポジトリで使うラベルを “宣言的” に管理するファイルです。
+# 名称・色をここで定義 → actions-labeler が無くても
+# GitHub UI で「Labels ▸ Create from file」から一括登録できます。
+#
+# ─────────────────────────────────────────────
+#  colour: 6文字の 16進 (RRGGBB)
+#  description: ラベルの補足（省略可）
+# ─────────────────────────────────────────────
+labels:
+  - name: dependabot
+    color: "0366d6"        # Dependabot 公式カラー
+    description: "🔄 依存パッケージ自動更新 PR"
