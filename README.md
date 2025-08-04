@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/gotty412/RecipeVault/actions/workflows/flutter_ci.yml/badge.svg)
 [![codecov](https://codecov.io/github/gotty412/RecipeVault/branch/main/graph/badge.svg?token=IME8KHG5LE)](https://codecov.io/github/gotty412/RecipeVault)
-[![codecov](https://codecov.io/github/gotty412/recipevault/graph/badge.svg?token=IME8KHG5LE)](https://codecov.io/github/gotty412/recipevault)
+[![codecov](https://codecov.io/github/gotty412/recipevault/branch/main/graph/badge.svg?token=IME8KHG5LE)](https://codecov.io/github/gotty412/recipevault)
 
 &#x20;
 
