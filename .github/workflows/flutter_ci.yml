@@ -26,6 +26,11 @@ jobs:
       # テスト
       - run: flutter test --coverage
 
+      - name: debug codecov token length
+        run: echo "TOKEN_LENGTH=${#CODECOV_TOKEN}"
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
       # 
       - name: Codecov
         uses: codecov/codecov-action@v5
