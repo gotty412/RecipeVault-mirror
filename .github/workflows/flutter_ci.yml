@@ -66,4 +66,5 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}   # Public repoなら token 行は不要
         with:
           files: coverage/lcov.info
+          slug: gotty412/RecipeVault
           # verbose: true   # ← 詳細ログを出したい場合。不要なら削除
