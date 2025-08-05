@@ -2,6 +2,7 @@
 # .github/workflows/flutter_ci.yml
 #   - ジョブ ❶ analyze   : lint を高速チェック
 #   - ジョブ ❷ test      : ユニットテスト + カバレッジ（Codecov）
+#     ❷ の中で ★ pub outdated を実行して “古い依存” を検知
 #   ※ test は analyze が通った場合だけ実行 (needs:)
 # ------------------------------------------------------------------
 
@@ -40,7 +41,7 @@ jobs:
 # ----------------------------------------------------
   test:
     name: Test & Coverage (Flutter)
-    needs: analyze          # 依存関係
+    needs: analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -56,10 +57,14 @@ jobs:
       # 3) 依存取得
       - run: flutter pub get
 
-      # 4) ユニットテスト + カバレッジ生成
+      # 4) ★ 古い依存パッケージがないかチェック（警告のみで CI は落とさない）
+      - run: flutter pub outdated --mode=null-safety || true
+        name: Check outdated packages
+
+      # 5) ユニットテスト + カバレッジ生成
       - run: flutter test --coverage
 
-      # 5) カバレッジを Codecov へアップロード
+      # 6) カバレッジを Codecov へアップロード
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         env:
