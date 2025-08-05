@@ -6,6 +6,7 @@ import '../models/recipe.dart';
 import '../services/recipe_service.dart';
 import '../services/ad_service.dart';
 import 'edit_recipe_page.dart';
+import 'settings_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -31,23 +32,39 @@ class HomePage extends StatelessWidget {
         return Scaffold(
           // ── AppBar：右端に「登録数 / 上限」バッジを表示 ──────────────
           appBar: AppBar(
-            title: Row(
-              children: [
-                const Text('My Recipes'),
-                const Spacer(),
-                Container(
+            title: const Text('My Recipes'),
+
+            // ここに右側ウィジェットを並べる
+            actions: [
+              // ① 登録数 / 上限バッジ（ライト/ダークで自動配色）
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade100,
+                    color: Theme.of(context).colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '${recipes.length} / ${recipeService.quota}',
-                    style: const TextStyle(fontSize: 12),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              // ② “⚙︎” 設定ボタン
+              IconButton(
+                icon: const Icon(Icons.settings),
+                tooltip: '設定',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                ),
+              ),
+            ],
           ),
 
           // ── レシピ一覧 ───────────────────────────────

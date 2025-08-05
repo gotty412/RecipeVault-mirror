@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe_vault/theme_notifier.dart';
 
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
@@ -43,6 +44,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => RecipeService()),
         ChangeNotifierProvider.value(value: adService),
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ],
       child: const RecipeVaultApp(),
     ),
@@ -76,8 +78,7 @@ class RecipeVaultApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode
-          .system, // 端末がダークモードなら darkTheme を自動適用（手動切替の余地も残せる）
+      themeMode: context.watch<ThemeNotifier>().mode,
 
       // ルートページ
       home: const HomePage(),
