@@ -1,0 +1,39 @@
+name: Mirror to public
+
+on:
+  push:
+    branches: [ main ]     # main に push されたら動く
+  workflow_dispatch:        # 手動実行も可
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # 履歴全部（タグ等）を扱えるように
+
+      # ① SSH秘密鍵をエージェントに載せる
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MIRROR_SSH_KEY }}
+
+      # ② ホスト鍵を登録（Host key verification failed 対策）
+      - name: Add github.com to known_hosts
+        run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+      # ③ ミラーへ push
+      - name: Push to mirror
+        run: |
+          git config user.name  "mirror-bot"
+          git config user.email "mirror@users.noreply.github.com"
+
+          git remote add mirror git@github.com:gotty412/RecipeVault-mirror.git
+
+          # A) main と tags だけでOK（おすすめ）
+          git push --force mirror main
+          git push --tags mirror
+
+          # B) 全ブランチ/タグを完全ミラー（必要なときだけ）
+          # git push --mirror mirror
