@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    match /users/{uid} {
+      allow read, create, update: if isOwner(uid);
+    }
+
+    // レシピ: /recipes/{uid}/items/{id}
+    match /recipes/{uid}/items/{id} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == request.auth.uid
+        // maxRecipes と recipeCount は後で Functions で維持
+        && get(/databases/$(database)/documents/users/$(uid)).data.recipeCount
+           < get(/databases/$(database)/documents/users/$(uid)).data.maxRecipes;
+      allow update, delete: if isOwner(uid) && resource.data.uid == request.auth.uid;
+    }
+
+    // 広告リワードのイベントログ（冪等性用）
+    match /rewards/{uid}/events/{eventId} {
+      allow read, create: if isOwner(uid);
+    }
+  }
+}
