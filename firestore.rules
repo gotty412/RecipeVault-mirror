@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+    function maxRecipes(uid) {
+      return (userDoc(uid).data.maxRecipes ?? 10);
+    }
+    function recipeCount(uid) {
+      return (userDoc(uid).data.recipeCount ?? 0);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      // クライアントは作成のみ可（必要最低限のフィールドだけ）。以降の更新はサーバーのみ
+      allow create: if isOwner(uid);
+      allow update, delete: if false;
+    }
+
+    match /recipes/{uid}/items/{id} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.uid == request.auth.uid
+        && recipeCount(uid) < maxRecipes(uid);
+      allow update, delete: if isOwner(uid) && resource.data.uid == request.auth.uid;
+    }
+
+    match /rewards/{uid}/events/{eventId} {
+      allow read: if isOwner(uid);
+      // ここは Functions からのみ書き込み（クライアントは不可）
+      allow create, update, delete: if false;
+    }
+  }
+}

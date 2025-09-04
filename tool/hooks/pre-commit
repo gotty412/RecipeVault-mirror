@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+echo "🔍 Running flutter analyze…"
+flutter analyze --no-pub --fatal-infos || exit 1
+
+echo "🧪 Running flutter test…"
+flutter test --coverage || exit 1
